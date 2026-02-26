@@ -1,0 +1,14 @@
+<div class="form-container">
+  <form (submit)="onSubmit($event)">
+    <input type="text" placeholder="title" [formField]="boardGameForm.title" >
+    <input type="text" placeholder="publisher" [formField]="boardGameForm.publisher" >
+    <input type="number" placeholder="year" [formField]="boardGameForm.year" >
+    <input type="text" placeholder="designer" [formField]="boardGameForm.designer" >
+    <input type="text" placeholder="artist" [formField]="boardGameForm.artist" >
+
+    <button type="submit"
+      [disabled]="!boardGameForm.title().value() || !boardGameForm.designer().value()">
+        Save
+    </button>
+  </form>
+</div>
