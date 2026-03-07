@@ -1,0 +1,11 @@
+<div class="cars-list">
+  @for (car of carsList; track car.model) {
+    <div class="car-item">
+      <div>{{ car.brand }}</div>
+      <div>{{ car.model }}</div>
+      <div>Wheel size: {{ car.wheelSize }} inches</div>
+      <div>Is Electric Car: {{ car.isElectric ? 'V' : 'X' }}</div>
+      <div>Is Hybrid Car: {{ car.isHybrid ? 'V' : 'X' }}</div>
+    </div>
+  }
+</div>

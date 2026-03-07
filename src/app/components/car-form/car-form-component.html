@@ -1,0 +1,55 @@
+<form [formGroup]="carForm" (ngSubmit)="onSubmit($event)" class="car-form">
+  <h2>Vehicle Specifications</h2>
+
+  <div class="form-field">
+    <label for="brand">Brand</label>
+    <input
+      id="brand"
+      type="text"
+      formControlName="brand"
+      placeholder="Car brand..."
+      [class.invalid]="carForm.get('brand')?.invalid && carForm.get('brand')?.touched"
+    >
+    @if (carForm.get('brand')?.hasError('required') && carForm.get('brand')?.touched) {
+      <small class="error-msg">Brand is required</small>
+    }
+  </div>
+
+  <div class="form-field">
+    <label for="model">Model</label>
+    <input
+      id="model"
+      type="text"
+      formControlName="model"
+      placeholder="Model name..."
+    >
+  </div>
+
+  <div class="form-field">
+    <label for="wheelSize">Wheel Size</label>
+    <select id="wheelSize" formControlName="wheelSize">
+      <option [ngValue]="null" disabled>Select size</option>
+      @for (size of wheelSizes; track size) {
+        <option [value]="size">{{ size }} inches</option>
+      }
+    </select>
+  </div>
+
+  <fieldset class="checkbox-group">
+    <legend>Powertrain Type</legend>
+
+    <label class="checkbox-label">
+      <input type="checkbox" formControlName="isElectric">
+      Electric Vehicle (EV)
+    </label>
+
+    <label class="checkbox-label">
+      <input type="checkbox" formControlName="isHybrid">
+      Hybrid
+    </label>
+  </fieldset>
+
+  <button type="submit" [disabled]="carForm.invalid" class="submit-btn">
+    Save Vehicle
+  </button>
+</form>

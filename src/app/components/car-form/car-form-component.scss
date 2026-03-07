@@ -1,0 +1,17 @@
+.car-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 400px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.error-msg {
+  color: #d32f2f;
+  font-size: 0.8rem;
+}
