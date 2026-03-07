@@ -3,14 +3,7 @@ import {form, FormField, minLength, required, debounce} from '@angular/forms/sig
 import {InputText} from 'primeng/inputtext';
 import {ButtonDirective} from 'primeng/button';
 import {FormsModule} from '@angular/forms';
-
-interface BoardGame {
-  title: string,
-  publisher: string,
-  designer: string,
-  artist: string,
-  year?: number,
-}
+import {BoardGame} from '../../models/interfaces';
 
 @Component({
   selector: 'app-signal-form',
@@ -29,7 +22,8 @@ export class SignalForm implements OnInit {
     title: '',
     publisher: '',
     designer: '',
-    artist: ''
+    artist: '',
+    url: ''
   });
 
   boardGameForm = form(this.boardGameModel, (path) => {
