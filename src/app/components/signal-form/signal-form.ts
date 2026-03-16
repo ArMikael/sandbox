@@ -1,9 +1,10 @@
-import { Component, OnInit, signal } from '@angular/core';
-import {form, FormField, minLength, required, debounce, Schema, schema, apply} from '@angular/forms/signals';
+import {Component, inject, OnInit, signal} from '@angular/core';
+import { form, FormField, minLength, required, debounce, Schema, schema, apply } from '@angular/forms/signals';
 import { InputText } from 'primeng/inputtext';
 import { ButtonDirective } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { BoardGame } from '../../models/interfaces';
+import { BoardGamesStore } from '../../stores/board-games.store';
 
 
 // We can define all validators and messages as a schema to apply it on multiple fields at the same time.
@@ -21,11 +22,12 @@ const textInputSchema: Schema<string> = schema<string>((path) => {
     ButtonDirective,
     FormsModule
   ],
-  providers: [],
   templateUrl: './signal-form.html',
   styleUrl: './signal-form.scss',
 })
 export class SignalForm implements OnInit {
+  bgStore = inject(BoardGamesStore);
+
   boardGameModel = signal<BoardGame>({
     title: '',
     publisher: '',
@@ -55,6 +57,8 @@ export class SignalForm implements OnInit {
   onSubmit(event: Event) {
     event.preventDefault();
 
-    console.log(this.boardGameForm);
+    if (this.boardGameForm().valid()) {
+      this.bgStore.addBoardGame(this.boardGameForm().value());
+    }
   }
 }

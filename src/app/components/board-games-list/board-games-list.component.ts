@@ -1,20 +1,22 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { BoardGamesService } from '../../services/board-games.service';
 import { BoardGame } from '../../models/interfaces';
+import { BoardGamesStore } from '../../stores/board-games.store';
 
 @Component({
   selector: 'app-board-games-list',
+  standalone: true,
   imports: [],
   templateUrl: './board-games-list.component.html',
   styleUrl: './board-games-list.component.scss',
 })
-export class BoardGamesListComponent implements OnInit {
+export class BoardGamesListComponent {
   private boardGamesService = inject(BoardGamesService);
-  boardGamesList = signal<Array<BoardGame>>([]);
+  /* Bringing data using NgRx Signal Store */
+  bgStore = inject(BoardGamesStore);
 
-  ngOnInit(): void {
-    this.boardGamesService.getBoardGamesList().subscribe((boardGames) => {
-      this.boardGamesList.set(boardGames);
-    });
-  }
+  /* Bringing data using the service */
+  // this.boardGamesService.getBoardGamesList().subscribe((boardGames) => {
+  //   this.boardGamesList.set(boardGames);
+  // });
 }

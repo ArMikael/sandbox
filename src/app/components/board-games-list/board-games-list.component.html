@@ -1,1 +1,9 @@
-<p>board-games-list works!</p>
+<div class="board-games-list">
+  @for (boardGame of bgStore.boardGamesList(); track $index) {
+    <div class="board-game-item">
+      <div class="board-game-item__title">{{ boardGame.title }}</div>
+      <div class="board-game-item__designer">{{ boardGame.designer }}</div>
+      <div class="board-game-item__year">{{ boardGame.year }}</div>
+    </div>
+  }
+</div>

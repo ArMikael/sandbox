@@ -18,6 +18,7 @@
 
     <input type="text" placeholder="Designer" pInputText [formField]="boardGameForm.designer">
     <input type="text" placeholder="Artist" pInputText [formField]="boardGameForm.artist">
+    <input type="text" placeholder="Url" pInputText [formField]="boardGameForm.url">
 
     <button pButton type="submit"
       [disabled]="!boardGameForm.title().value() || !boardGameForm.designer().value()">
