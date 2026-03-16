@@ -1,9 +1,15 @@
 <div class="board-games-list">
+  <div class="board-game-list__total-value">
+    {{ bgStore.totalBoardGames() }}
+  </div>
+
   @for (boardGame of bgStore.boardGamesList(); track $index) {
     <div class="board-game-item">
       <div class="board-game-item__title">{{ boardGame.title }}</div>
       <div class="board-game-item__designer">{{ boardGame.designer }}</div>
+      <div class="board-game-item__artist">{{ boardGame.artist }}</div>
       <div class="board-game-item__year">{{ boardGame.year }}</div>
+      <div class="board-game-item__url">{{ boardGame.url }}</div>
     </div>
   }
 </div>

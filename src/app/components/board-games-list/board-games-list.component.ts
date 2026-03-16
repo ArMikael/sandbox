@@ -10,7 +10,7 @@ import { BoardGamesStore } from '../../stores/board-games.store';
   templateUrl: './board-games-list.component.html',
   styleUrl: './board-games-list.component.scss',
 })
-export class BoardGamesListComponent {
+export class BoardGamesListComponent implements OnInit {
   private boardGamesService = inject(BoardGamesService);
   /* Bringing data using NgRx Signal Store */
   bgStore = inject(BoardGamesStore);
@@ -19,4 +19,8 @@ export class BoardGamesListComponent {
   // this.boardGamesService.getBoardGamesList().subscribe((boardGames) => {
   //   this.boardGamesList.set(boardGames);
   // });
+
+  ngOnInit(): void {
+    this.bgStore.getExistingBoardGames();
+  }
 }
