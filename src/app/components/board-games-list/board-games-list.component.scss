@@ -1,0 +1,35 @@
+:host {
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+}
+
+.board-game-item {
+  width: auto;
+  max-width: 500px;
+  background-color: beige;
+  margin-bottom: 10px;
+  padding: 16px;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1), 0 6px 10px 0 rgba(0, 0, 0, 0.1);
+
+  &__title {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .board-game-title {
+    margin: 0 0 10px 0;
+  }
+
+  .board-game-field-title {
+    font-weight: bold;
+  }
+
+  &__link {
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

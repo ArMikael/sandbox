@@ -1,15 +1,41 @@
 <div class="board-games-list">
-  <div class="board-game-list__total-value">
-    {{ bgStore.totalBoardGames() }}
-  </div>
+  <h4 class="board-game-list__total-value">
+    Total number of games: {{ bgStore.totalBoardGames() }}
+  </h4>
 
   @for (boardGame of bgStore.boardGamesList(); track $index) {
     <div class="board-game-item">
-      <div class="board-game-item__title">{{ boardGame.title }}</div>
-      <div class="board-game-item__designer">{{ boardGame.designer }}</div>
-      <div class="board-game-item__artist">{{ boardGame.artist }}</div>
-      <div class="board-game-item__year">{{ boardGame.year }}</div>
-      <div class="board-game-item__url">{{ boardGame.url }}</div>
+      <div class="board-game-item__title">
+        <h3 class="board-game-title">
+          {{ boardGame.title }}
+          @if (boardGame.year) {
+            <span class="board-game-item__year">({{ boardGame.year }})</span>
+          }
+        </h3>
+      </div>
+      <div class="board-game-item__designer">
+        <span class="board-game-field-title">
+          Designers:
+        </span>
+        {{ boardGame.designer }}
+      </div>
+      <div class="board-game-item__artist">
+        <span class="board-game-field-title">
+          Artists:
+        </span>
+        {{ boardGame.artist }}
+      </div>
+
+      <div class="board-game-item__publisher">
+        <span class="board-game-field-title">
+          Publisher:
+        </span>
+        {{ boardGame.publisher }}
+      </div>
+
+      <div class="board-game-item__url">
+        <a class="board-game-item__link" [href]="boardGame.url">Link to BGG</a>
+      </div>
     </div>
   }
 </div>
