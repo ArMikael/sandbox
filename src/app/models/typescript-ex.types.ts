@@ -179,6 +179,10 @@ function checkEntity(roadEntity: RoadEntities) {
       console.log('TrafficDisruption');
       return roadEntity.type;
 
+    case 'SpecialEvent':
+      console.log('SpecialEvent');
+      return roadEntity.type;
+
     default:
       console.log('Default');
       const _exhaustiveCheck: never = roadEntity;
@@ -261,3 +265,231 @@ const usersList: User[] = [
 ];
 
 const normalizedUserList = normalizeUsers(usersList);
+
+
+// 15. Комбинация typeof и keyof (Intermediate)
+// Дан объект с настройками:
+// const config = { theme: 'dark', language: 'ru', apiTimeout: 5000 };
+// С помощью typeof создайте тип ConfigType на основе этого объекта.
+// Затем напишите функцию getSetting, которая принимает два аргумента: сам объект настроек и ключ.
+// Используйте keyof ConfigType, чтобы TypeScript разрешал передавать только валидные ключи ('theme', 'language' или 'apiTimeout').
+const config = { theme: 'dark', language: 'ru', apiTimeout: 5000 };
+
+type ConfigType = typeof config;
+
+// Type Inference (Вывод типов)
+function getSetting<T extends keyof ConfigType>(config: ConfigType, key: T): ConfigType[T] {
+  return config[key];
+}
+
+const settingsVal = getSetting(config, 'theme');
+
+
+
+// Задача: "Employee Hierarchy Transformer"
+// Представь, что бэкенд возвращает список сотрудников в «плоском» виде.
+// Тебе нужно написать универсальную функцию-трансформер, которая превратит этот массив в иерархическое дерево
+// (например, для отрисовки оргсхемы).
+
+// Условия (Requirements)
+// Типизация (Generics):
+// - Функция должна быть универсальной.
+// - Она не должна быть жестко привязана к типу Employee.
+// - Она должна работать с любым объектом, у которого есть уникальный идентификатор (id) и ссылка на родителя (parentId).
+// - Strict Typing: Используй Generics, чтобы результирующее дерево сохранило все поля исходного объекта.
+// Результирующий тип должен автоматически добавлять поле children, которое является массивом объектов того же типа.
+// Используй keyof, чтобы указать, какие именно поля в объекте отвечают за id и parentId
+// (так как на бэкенде они могут называться по-разному, например uuid и managerId).
+
+// Логика:
+// - Функция должна принимать массив объектов.
+// - Функция должна возвращать массив «корневых» узлов (у которых parentId равен null, undefined или пустой строке).
+// - Сложность алгоритма должна быть $O(n)$, желательно избежать вложенных циклов $O(n^2)$.
+
+type TreeNode<T> = T & {
+  children: TreeNode<T>[]
+};
+
+function arrayToTree<T, K extends keyof T>(
+  items: T[],
+  idKey: K,
+  parentIdKey: K
+): TreeNode<T>[] {
+  const rootNodes: TreeNode<T>[] = [];
+  const itemsMap: Map<T[K], TreeNode<T>> = new Map();
+
+  for (const item of items) {
+    itemsMap.set(item[idKey], { ...item, children: [] });
+  }
+
+  for (const item of items) {
+    const parentId = item[parentIdKey];
+    const node = itemsMap.get(item[idKey])!;
+
+    if (parentId === null || parentId === undefined || parentId === '') {
+      rootNodes.push(node);
+    } else {
+      const parentNode = itemsMap.get(parentId);
+
+      if (parentNode) {
+        parentNode.children.push(node);
+      }
+    }
+  }
+
+  return rootNodes;
+}
+
+interface Employee {
+  id: number;
+  name: string;
+  role: string;
+  managerId: number | null;
+}
+
+const employees: Employee[] = [
+  { id: 1, name: "Alice", role: "CEO", managerId: null },
+  { id: 2, name: "Bob", role: "CTO", managerId: 1 },
+  { id: 3, name: "Charlie", role: "Senior Dev", managerId: 2 },
+  { id: 4, name: "David", role: "Junior Dev", managerId: 2 },
+];
+
+const usersTree = arrayToTree(employees, 'id', 'managerId');
+console.log(usersTree);
+
+
+// 24. Операторы высшего порядка и вывод типов (Intermediate)
+// Сценарий: У нас есть поток ID пользователей (например, клики по списку).
+// Для каждого ID мы должны сделать сетевой запрос.
+// Задача: Замени все any на правильные типы. Убедись, что итоговый userProfile$ имеет тип Observable<UserProfile>,
+// а не Observable<Observable<UserProfile>>.
+import { Observable, of, debounceTime, distinctUntilChanged } from 'rxjs';
+import { switchMap, map } from 'rxjs/operators';
+
+interface UserProfileN {
+  id: number;
+  name: string;
+}
+
+// Заглушка сетевого запроса
+function fetchUser(id: number): Observable<UserProfileN | null> {
+  return of<UserProfileN | null>({ id, name: `User ${id}` });
+}
+
+// Исходный поток: клики по элементам, из которых мы достаем ID (строку)
+const clickId$: Observable<string> = of('1', '2', '3'); // Типизируй как поток строк
+
+// Преобразуй строки в числа и сделай запрос
+const userProfile$: Observable<UserProfileN | null> = clickId$.pipe(
+  map((id: string) => parseInt(id, 10)),
+  debounceTime(300),
+  distinctUntilChanged(),
+  switchMap((id: number) => fetchUser(id).pipe(
+    catchError(() => of(null))
+  )),
+);
+
+
+
+// 25. Обработка ошибок и изменение типа потока (Senior)
+// Сценарий: При ошибке запроса профиля мы не хотим "убивать" поток. Мы хотим вернуть гостевой профиль.
+// Задача: Типизируй catchError так, чтобы итоговый поток safeProfile$ честно говорил TypeScript,
+// что он может вернуть либо UserProfile, либо GuestProfile.
+import { catchError } from 'rxjs/operators';
+
+interface UserProfile { type: 'user'; name: string }
+interface GuestProfile { type: 'guest'; isAnonymous: true }
+type ResponseProfile = UserProfile | GuestProfile;
+
+function getUserStrict(id: number): Observable<UserProfile> {
+  // Представим, что здесь может вылететь ошибка
+  return of({ type: 'user', name: 'Michael' } as UserProfile);
+}
+
+const fallbackGuest: GuestProfile = { type: 'guest', isAnonymous: true };
+
+// Типизируй safeProfile$
+const safeProfile$: Observable<ResponseProfile> = getUserStrict(42).pipe(
+  catchError((error: unknown) => {
+    // Как правильно вернуть fallbackGuest, чтобы TS объединил типы?
+    return of<ResponseProfile>(fallbackGuest);
+  })
+);
+
+
+// 26. Собственный кастомный оператор (Expert)
+// Сценарий: Очень частая проблема — в потоке идут значения, включая null или undefined.
+// Нам нужен оператор filterNil, который не только отфильтрует их в рантайме, но и сузит тип для TypeScript.
+// Задача: Напиши функцию filterNil<T>(). Она должна возвращать OperatorFunction.
+// Используй TypeScript Type Predicate (is), чтобы после этого оператора тип Observable<string | null>
+// превращался строго в Observable<string>.
+import { OperatorFunction } from 'rxjs';
+import { filter } from 'rxjs/operators';
+
+// Реализуй эту функцию
+function filterNil<T>(): OperatorFunction<T, NonNullable<T>> {
+  return (source$) => source$.pipe(
+    filter((value: T): value is NonNullable<T> => value !== null && value !== undefined),
+  );
+}
+
+// Проверка:
+const mixed$: Observable<string | null | undefined> = of("Frontend", null, "Interview", undefined);
+
+// Тип strict$ должен стать строго Observable<string>
+const strict$ = mixed$.pipe(filterNil());
+
+
+
+// 27. Computed и Read-only Signals (Intermediate)
+// Сценарий: У нас есть корзина товаров. Мы хотим вычислять общую стоимость.
+// Задача: Типизируй сигналы. Покажи, как запретить разработчикам случайно менять значение totalPrice
+// напрямую (он должен быть только для чтения).
+import { signal, computed, WritableSignal, Signal } from '@angular/core';
+
+interface CartItem { id: number; price: number; amount: number; }
+
+// Типизируй корзину
+const cart = signal<CartItem[]>([
+  { id: 1, price: 100, amount: 2 },
+  { id: 2, price: 50, amount: 1 }
+]);
+
+// Напиши вычисляемый сигнал для суммы. Какой у него будет тип?
+const totalPrice = computed(() => {
+  return cart().reduce((acc, item) => acc + (item.price * item.amount), 0);
+});
+
+// Проверка: totalPrice.set(100) // Должно выдавать ошибку TS!
+
+
+
+// 28. Signal Inputs и Трансформация типов (Senior) - (Angular 17.1+ фича)
+// Сценарий: Твой компонент принимает id из URL (в Angular Router они всегда приходят как строки,
+// если включен bindToComponentInputs). Но внутри компонента тебе нужен строго number.
+// Задача: Используй новый API input() с опцией transform. Напиши функцию трансформации,
+// которая возьмет string | number, вернет number, и заставит InputSignal иметь тип number.
+
+import { Component, input, InputSignal } from '@angular/core';
+
+// Функция трансформации
+function toNumber(value: string | number): number {
+  return typeof value === 'string' ? parseInt(value, 10) : value;
+}
+
+@Component({
+  selector: 'app-user-detail',
+  template: `ID: {{ userId() }}`
+})
+export class UserDetailComponent {
+  // Настрой signal input так, чтобы извне можно было передать строку,
+  // но сам userId имел строгий тип InputSignal<number>
+  // Явно говорим: снаружи ждем string или number, а внутри будет number
+  userId = input.required<string | number, number>({
+    transform: toNumber
+  });
+
+  constructor() {
+    // const idType = this.userId(); // Должно быть number
+  }
+}
